@@ -1,0 +1,34 @@
+version: '3'
+services:
+    capa_base:
+        build: ./base
+        command: python base/manage.py runserver 0.0.0.0:8002
+        # command: ./run_web.sh
+        volumes:
+            - .:/code
+        ports:
+            - "8002:8002"
+
+    capa_interfaz:
+        build: ./interfaz/
+        volumes:
+            - "./interfaz :/src/app"
+        ports:
+            - "8080:8080"
+        links:
+            - capa_datos
+    capa_datos:
+        image: redis
+    capa_analisis:
+    capa_analisis:
+        # image: floydhub/dl-docker:cpu
+        image: uetchy/machinelearning
+        entrypoint:
+            # /bin/bash -c "/opt/conda/bin/conda install jupyter r r-irkernel -y --quiet && /opt/conda/bin/jupyter notebook --notebook-dir=/opt/notebooks --ip='*' --port=8888 --no-browser --allow-root"
+            /bin/bash -c "conda install r r-irkernel --use-index-cache && jupyter notebook --notebook-dir=/opt/notebooks --ip='*' --port=8888 --no-browser --allow-root"
+        ports:
+            - "8888:8888"
+        volumes:
+            - notebooks:/opt/notebooks
+volumes:
+    notebooks:
